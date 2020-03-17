@@ -596,37 +596,112 @@ def get_possible_branch_point_matches(linear_code_expression,
         return tuple(filter(is_possible_branch_point_match, subsequences))
 
 
-#####################################################
-# Comparing nonempty matches for pairs of operators #
-#####################################################
+########################################
+# Analyze a single glycan and operator #
+########################################
 
 
-def compare_matches(uncertainty_operator_A, uncertainty_operator_B,
-                    linear_code_expression, as_generator=False,
-                    with_contexts=False):
+def analyze_matches(linear_code_expression, uncertainty_operator,
+                    substitution=None, with_context=False):
     '''
-    Given a linear code expression e and two uncertainty operators A,B,
-    this returns a dict consisting of the set of nonempty subsequences of e
-     - that match A and B ('both')
-     - that match A but not B ('A')
-     - that match B but not A ('B')
-     - that match neither A nor B ('neither')
+    This function has two basic modes of operation, and implements the core
+    functionality of the command-line functionality of the script.
+
+    1. Given a linear code expression representing a single glycan and one of 
+    Krambeck et al. 2009's uncertainty operators ('...', '_', '|'), this 
+    returns a set representing information about nonempty subsequences of the
+    glycan that match the uncertainty operator.
+
+    If with_context is False (and no substitution is provided), returns a sorted
+    tuple containing the unique substrings of the glycan that match the  
+    operator. Otherwise, returns an analogous tuple of 3-tuples of the form 
+        (left context, match, right context)
+
+    2. Given a linear code expression with a single instance of one of Krambeck 
+    et al. 2009's uncertainty operators and a string representing a possible
+    substitution for the uncertainty operator, returns a boolean indicating  
+    whether the substitution string is a match for the uncertainty operator.
+
+    (If substitution is non-null, with_context has no effect.)
     '''
+    assert uncertainty_operator in {'...','_','|'}, "unknown uncertainty operator:\n{0}".format(uncertainty_operator)
+
     pred_mapper = {'...':is_ligand_match,
                    '_':is_continuation_match,
                    '|':is_possible_branch_point_match}
     get_mapper = {'...':get_ligand_matches,
                   '_':get_continuation_matches,
                   '|':get_possible_branch_point_matches}
+    my_pred = pred_mapper[uncertainty_operator]
+    my_getter = get_mapper[uncertainty_operator]
+
+
+
+
+#####################################################
+# Comparing nonempty matches for pairs of operators #
+#####################################################
+
+
+def compare_matches(uncertainty_operator_A, uncertainty_operator_B,
+                    linear_code_expression, with_contexts=False,
+                    include_contexts_in_uniqueness=True):
+    '''
+    Uncertainty operators must be one of Krambeck et al. 2009's three 
+    operators: 
+     - ligand = '...'
+     - continuation = '_'
+     - possible branch point = '|'
+
+    Given a linear code expression e and two uncertainty operators A,B,
+    this returns a dict consisting of the set of nonempty subsequences of e
+     - that match A and B ('both')
+     - that match A but not B ('A')
+     - that match B but not A ('B')
+     - that match neither A nor B ('neither')
+    
+    If with_contexts is True, then returned matches will be a set of 3-tuples:
+      (left context of the match, the match, the right context of the match)
+
+    If include_contexts_in_uniqueness is True, then any two matches (whether 
+    from the same operator or distinct operators) are considered the same iff
+    not only their match string is the same, but their left and right contexts
+    are the same as well.
+    '''
+    pred_mapper = {'...':is_ligand_match,
+                   '_':is_continuation_match,
+                   '|':is_possible_branch_point_match}
+    #get_mapper = {'...':get_ligand_matches,
+    #              '_':get_continuation_matches,
+    #              '|':get_possible_branch_point_matches}
     A_pred, B_pred = pred_mapper[uncertainty_operator_A], pred_mapper[uncertainty_operator_B]
-    A_getter, B_getter = get_mapper[uncertainty_operator_A], get_mapper[uncertainty_operator_B]
-
-    A_matches, A_nonmatches = split(A_pred, generate_subsequences(tokenizer(linear_code_expression)))
-    B_matches, B_nonmatches = split(B_pred, generate_subsequences(tokenizer(linear_code_expression)))
-
+    #A_getter = lambda lce: get_mapper[uncertainty_operator_A](lce, 
+    #                                                          with_contexts=with_contexts) 
+    #B_getter = lambda lce: get_mapper[uncertainty_operator_B](lce,
+    #                                                          with_contexts=with_contexts) 
+    A_matches = tuple(filter(A_pred,
+                             generate_subsequences(tokenizer(linear_code_expression),
+                                                   with_contexts=with_contexts)))
+    B_matches = tuple(filter(B_pred,
+                             generate_subsequences(tokenizer(linear_code_expression),
+                                                   with_contexts=with_contexts)))
+    #A_matches, A_nonmatches = split(A_pred,
+    #                                generate_subsequences(tokenizer(linear_code_expression),
+    #                                                      with_contexts=with_contexts))
+    #B_matches, B_nonmatches = split(B_pred,
+    #                                generate_subsequences(tokenizer(linear_code_expression),
+    #                                                      with_contexts=with_contexts))
+    #del A_nonmatches
+    #del B_nonmatches
+    
     uniquifier = lambda l: set(map(partial(str_join, ''), l))
-    A_matches_unique, A_nonmatches_unique = uniquifier(A_matches), uniquifier(A_nonmatches)
-    B_matches_unique, B_nonmatches_unique = uniquifier(B_matches), uniquifier(B_nonmatches)
+    if with_contexts:
+        uniquifier_single = deepcopy(uniquifier)
+        uniquifier_match = lambda match: tuple(map(uniquifier_single, match))
+    else:
+        uniquifier_match = uniquifier
+    A_matches_unique, A_nonmatches_unique = uniquifier_match(A_matches), uniquifier_match(A_nonmatches)
+    #B_matches_unique, B_nonmatches_unique = uniquifier_match(B_matches), uniquifier_match(B_nonmatches)
 
     both = set.intersection(A_matches_unique, B_matches_unique)
     neither = set.union(A_nonmatches_unique, B_nonmatches_unique)
@@ -654,3 +729,4 @@ def glypy_plottable(linear_code_expression):
         return False
 
 
+def 
