@@ -10,6 +10,7 @@ import glypy
 #from glypy.plot import plot
 import glypy.io.linear_code
 
+
 ###########################################
 # glypy imports and convenience functions #
 ###########################################
@@ -594,5 +595,62 @@ def get_possible_branch_point_matches(linear_code_expression,
     else:
         return tuple(filter(is_possible_branch_point_match, subsequences))
 
+
+#####################################################
+# Comparing nonempty matches for pairs of operators #
+#####################################################
+
+
+def compare_matches(uncertainty_operator_A, uncertainty_operator_B,
+                    linear_code_expression, as_generator=False,
+                    with_contexts=False):
+    '''
+    Given a linear code expression e and two uncertainty operators A,B,
+    this returns a dict consisting of the set of nonempty subsequences of e
+     - that match A and B ('both')
+     - that match A but not B ('A')
+     - that match B but not A ('B')
+     - that match neither A nor B ('neither')
+    '''
+    pred_mapper = {'...':is_ligand_match,
+                   '_':is_continuation_match,
+                   '|':is_possible_branch_point_match}
+    get_mapper = {'...':get_ligand_matches,
+                  '_':get_continuation_matches,
+                  '|':get_possible_branch_point_matches}
+    A_pred, B_pred = pred_mapper[uncertainty_operator_A], pred_mapper[uncertainty_operator_B]
+    A_getter, B_getter = get_mapper[uncertainty_operator_A], get_mapper[uncertainty_operator_B]
+
+    A_matches, A_nonmatches = split(A_pred, generate_subsequences(tokenizer(linear_code_expression)))
+    B_matches, B_nonmatches = split(B_pred, generate_subsequences(tokenizer(linear_code_expression)))
+
+    uniquifier = lambda l: set(map(partial(str_join, ''), l))
+    A_matches_unique, A_nonmatches_unique = uniquifier(A_matches), uniquifier(A_nonmatches)
+    B_matches_unique, B_nonmatches_unique = uniquifier(B_matches), uniquifier(B_nonmatches)
+
+    both = set.intersection(A_matches_unique, B_matches_unique)
+    neither = set.union(A_nonmatches_unique, B_nonmatches_unique)
+    just_A = A_matches_unique - B_matches_unique
+    just_B = B_matches_unique - A_matches_unique
+
+    result_dict = {'both':both,
+                   'just_A':just_A,
+                   'just_B':just_B,
+                   'neither':neither}
+    return result_dict
+
+
+def glypy_plottable(linear_code_expression):
+    '''
+    Returns whether `linear_code_expression` causes glypy's plotting 
+    facilities to raise an exception or not.
+
+    (Will statefully induce a plot as a side-effect where possible.)
+    '''
+    try:
+        parsePlot(linear_code_expression)
+        return True
+    except Exception as e:
+        return False
 
 
