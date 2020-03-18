@@ -601,29 +601,84 @@ def get_possible_branch_point_matches(linear_code_expression,
 ########################################
 
 
+def check_match(linear_code_expression, substitution):
+    '''
+    Given a linear code expression with a single instance of one of Krambeck 
+    et al. 2009's uncertainty operators 
+     - '...'
+     - '_'
+     - '|'
+    and a string representing a possible substitution for the uncertainty 
+    operator, returns a boolean indicating whether both conditions hold:
+      - the substitution string is a match for the uncertainty operator.
+      - substituting the string in for the uncertainty operator results in a
+        syntactically well-formed linear code expression.
+          - Note that a syntactically well-formed linear code expression need
+            not be a physically possible glycan.
+          - Currently the only well-formedness check performed is whether the
+            expression resulting from the substitution has balanced 
+            parentheses.
+
+    If no operator token is detected, then the only valid substitution values 
+    are
+      - ''
+      - None
+    '''
+    lce = linear_code_expression
+    sub = substitution
+    op = uncertainty_operator
+
+    assert op in {'...','_','|'}, "Unknown uncertainty operator:\n\t{0}".format(op)
+
+    pred_mapper = {'...':is_ligand_match,
+                   '_':is_continuation_match,
+                   '|':is_possible_branch_point_match}
+    #get_mapper = {'...':get_ligand_matches,
+    #              '_':get_continuation_matches,
+    #              '|':get_possible_branch_point_matches}
+    my_pred = pred_mapper[op]
+    #my_getter = get_mapper[uncertainty_operator]
+    
+    ligand_ops_present = lce.count('...')
+    continuation_ops_present = lce.count('_')
+    possible_branch_ops_present = lce.count('|')
+
+    total_op_tokens_present = sum([ligand_ops_present, 
+                                   continuation_ops_present, 
+                                   possible_branch_ops_present])
+    if total_op_tokens_present > 1:
+        raise Exception("There is more than one token of at least one uncertainty operator present in\n\t{0}".format(lce))
+
+    if total_op_tokens_present == 0:
+        print("No uncertainty operators detected in '{0}'".format(lce))
+        if sub == '' or sub is None:
+            return True
+        return False
+
+    sub_is_match = my_pred(sub)
+    if not sub_is_match:
+        return False
+    lce_with_sub = lce.replace(op, sub) 
+    result_has_balanced_parens = has_balanced_parens(lce_with_sub)
+    result_is_wellformed = result_has_balanced_parens
+    return sub_is_match and result_is_wellformed
+
+
 def analyze_matches(linear_code_expression, uncertainty_operator,
                     substitution=None, with_context=False):
     '''
-    This function has two basic modes of operation, and implements the core
-    functionality of the command-line functionality of the script.
-
-    1. Given a linear code expression representing a single glycan and one of 
-    Krambeck et al. 2009's uncertainty operators ('...', '_', '|'), this 
-    returns a set representing information about nonempty subsequences of the
-    glycan that match the uncertainty operator.
+    Given 
+     - a linear code expression representing a single glycan 
+     - one of Krambeck et al. 2009's uncertainty operators ('...', '_', '|') 
+    this returns a set representing information about nonempty subsequences of 
+    the glycan that match the uncertainty operator.
 
     If with_context is False (and no substitution is provided), returns a sorted
     tuple containing the unique substrings of the glycan that match the  
     operator. Otherwise, returns an analogous tuple of 3-tuples of the form 
         (left context, match, right context)
-
-    2. Given a linear code expression with a single instance of one of Krambeck 
-    et al. 2009's uncertainty operators and a string representing a possible
-    substitution for the uncertainty operator, returns a boolean indicating  
-    whether the substitution string is a match for the uncertainty operator.
-
-    (If substitution is non-null, with_context has no effect.)
     '''
+    lce = linear_code_expression
     assert uncertainty_operator in {'...','_','|'}, "unknown uncertainty operator:\n{0}".format(uncertainty_operator)
 
     pred_mapper = {'...':is_ligand_match,
@@ -634,8 +689,20 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
                   '|':get_possible_branch_point_matches}
     my_pred = pred_mapper[uncertainty_operator]
     my_getter = get_mapper[uncertainty_operator]
+    
+    ligand_ops_present = lce.count('...')
+    continuation_ops_present = lce.count('_')
+    possible_branch_ops_present = lce.count('|')
 
+    total_op_tokens_present = sum([ligand_ops_present, 
+                                   continuation_ops_present, 
+                                   possible_branch_ops_present])
+    if total_op_tokens_present > 1:
+        raise Exception("There is more than one token of at least one uncertainty operator present in\n\t{0}".format(lce))
 
+    if substitution is not None:
+        if total_op_tokens_present == 0
+        lce_with_sub =  
 
 
 #####################################################
@@ -729,4 +796,4 @@ def glypy_plottable(linear_code_expression):
         return False
 
 
-def 
+#def 
