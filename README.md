@@ -37,7 +37,8 @@ All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 The three most salient dependencies are
  - `funcy`
  - `glypy` (so far only necessary for development, not for CLI functionality or most other functions)
- - `Python 2.7` (because `glypy` does not currently support Python 3.)
+ - `Python 2.7`
+    - `glypy` does not currently support Python 3.
 
 To set up a new conda environment that contains this repository's dependencies,
 1. `git clone` this repository to a filepath of your choice.
