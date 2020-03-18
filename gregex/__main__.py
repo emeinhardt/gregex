@@ -1,7 +1,10 @@
 from funcy import *
 import gregex
+
 import argparse
 #import os
+from collections import OrderedDict
+import csv
 
 my_desc = """Examine matches for uncertainty operators in a linear code expression.
 
@@ -67,7 +70,7 @@ if args.verbose:
     print(args)
 
 with_context = args.contexts
-to_excel = args.excel
+to_excel_fp = args.excel[0] if args.excel is not None else None
 lce = args.lce[0]
 operator = args.operator
 substitution = args.substitution
@@ -105,7 +108,7 @@ else:
         cols = tuple(cols)
         col_string = str_join('\t', cols)
         
-    if not to_excel:
+    if to_excel_fp is None:
         if colnames:
             print(col_string)
         columnify = lambda match_result: str_join('\t', match_result)
@@ -115,3 +118,13 @@ else:
             else:
                 #print(result)
                 print(columnify(result))
+    else:
+        results_dict = list(map(OrderedDict,
+                                map(lambda m: zip(cols, m),
+                                    results)))
+        with open(to_excel_fp, 'wb') as csv_file:
+            excel_writer = csv.DictWriter(csv_file, fieldnames=cols)
+            if colnames:
+                excel_writer.writeheader()
+            excel_writer.writerows(results_dict)
+
