@@ -11,6 +11,7 @@ This package contains functions (and a command-line interface to the main script
 
  - The code in this repository can be imported as a package for programmatic use: `import gregex`.
  - The command-line interface can be accessed via the usual `python -m gregex ...` route. **`python -m gregex -h` will bring up the `argparse` help.**
+    - Only a fraction of the package's functionality is currently exposed through the command-line interface.
 
 ### CLI example usage
 
