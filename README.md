@@ -1,4 +1,5 @@
 # `gregex`
+A parser for **g**lycan **reg**ular **ex**pressions
 
 ## Motivation / context
 
