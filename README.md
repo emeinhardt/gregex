@@ -19,6 +19,8 @@ For complete details and a description of *all* flags, use the command-line help
 
 `python -m gregex 'Ma6_M' -s '(Ma4)'` checks whether `(Ma4)` can be substituted for the operator `_` in `Ma6_M`. It can, so this returns `True` to stdout.
 
+#### Finding all nonempty matches for your choice of uncertainty operator in some glycan
+
 `python -m gregex 'Ma6(Ma4)M' -o '_'` writes a set of lines to stdout indicating all the nonempty subsequences of `Ma6(Ma4)M` that could be replaced with `_` and yield a syntactically well-formed linear code expression.
 
 `python -m gregex 'Ma6(Ma4)M' -o '_' -c` is the same, but each line now contains
