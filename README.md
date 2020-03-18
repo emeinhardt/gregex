@@ -36,8 +36,8 @@ for some match.
 All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 
 The three most salient dependencies are
- - `funcy`
- - `glypy` (so far only necessary for development, not for CLI functionality or most other functions)
+ - [`funcy`](https://funcy.readthedocs.io/en/stable/)
+ - [`glypy`](https://pythonhosted.org/glypy/) (so far only necessary for development, not for CLI functionality or most other functions)
  - `Python 2.7`
     - `glypy` does not currently support Python 3.
 
