@@ -665,7 +665,7 @@ def check_match(linear_code_expression, substitution):
 
 
 def analyze_matches(linear_code_expression, uncertainty_operator,
-                    substitution=None, with_context=False):
+                    substitution=None, with_context=False, verbose=False):
     '''
     Given 
      - a linear code expression representing a single glycan 
@@ -677,18 +677,32 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     tuple containing the unique substrings of the glycan that match the  
     operator. Otherwise, returns an analogous tuple of 3-tuples of the form 
         (left context, match, right context)
+
+    If substitution is not None, then this also returns for each match a 
+    boolean indicating whether both 
+     - the substitution matches the operator
+     - the expression resulting from the substitition is syntactically well-
+       formed.
+       - Currently, well-formedness just means that parentheses are balanced in
+         the complete expression post-substitution. 
+    If with_context is False, the output type will be a tuple of 2-tuples...
+    Similarly, if with_context is True, the output type will be a tuple of 
+    4-tuples.
     '''
     lce = linear_code_expression
-    assert uncertainty_operator in {'...','_','|'}, "unknown uncertainty operator:\n{0}".format(uncertainty_operator)
+    sub = substitution
+    op = uncertainty_operator
+
+    assert op in {'...','_','|'}, "Unknown uncertainty operator:\n\t{0}".format(op)
 
     pred_mapper = {'...':is_ligand_match,
                    '_':is_continuation_match,
                    '|':is_possible_branch_point_match}
-    get_mapper = {'...':get_ligand_matches,
-                  '_':get_continuation_matches,
-                  '|':get_possible_branch_point_matches}
-    my_pred = pred_mapper[uncertainty_operator]
-    my_getter = get_mapper[uncertainty_operator]
+    #get_mapper = {'...':get_ligand_matches,
+    #              '_':get_continuation_matches,
+    #              '|':get_possible_branch_point_matches}
+    my_pred = pred_mapper[op]
+    #my_getter = get_mapper[uncertainty_operator]
     
     ligand_ops_present = lce.count('...')
     continuation_ops_present = lce.count('_')
@@ -697,12 +711,55 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     total_op_tokens_present = sum([ligand_ops_present, 
                                    continuation_ops_present, 
                                    possible_branch_ops_present])
-    if total_op_tokens_present > 1:
-        raise Exception("There is more than one token of at least one uncertainty operator present in\n\t{0}".format(lce))
+    if total_op_tokens_present > 0:
+        raise Exception("There are uncertainty operators already present in '{0}'".format(lce)) 
 
-    if substitution is not None:
-        if total_op_tokens_present == 0
-        lce_with_sub =  
+    if verbose:
+        print('Calculating non-empty subsequence matches w/ contexts...')
+    matches = tuple(filter(my_pred,
+                           generate_subsequences(tokenizer(lce),
+                                                 with_contexts=True)))
+    if verbose:
+        print('Sorting...')
+    sorted_matches = sorted(matches, key=lambda tup: tup[1])
+    if verbose:
+        print('Removing duplicates (including contexts)...')
+    unique_sorted_matches = distinct(sorted_matches)
+
+    if sub is None:
+        if with_contexts:
+           return unique_sorted_matches 
+        else:
+            if verbose:
+                print('Removing contexts, resorting, and uniquifying...')
+            no_contexts = distinct(sorted(map(lambda t: t[1],
+                                              unique_sorted_matches)))
+    
+    sub_is_match = my_pred(sub)
+    if not sub_is_match:
+        if verbose:
+            print('{0} will never be a valid substitution for {1}...'.format(sub, op))
+        yields_well_formed_lce = lambda lmr: False
+    else:
+        combine = lambda lmr: str_join('', [lmr[0], sub, lmr[2]])
+        yields_well_formed_lce = lambda lmr: has_balanced_parens(combine(lmr))
+
+    if verbose:
+        print('Adding well-formedness result to every match...')
+    add_sub_result = lambda t, is_wff: tuple(list(t) + [is_wff])
+    results = tuple(map(add_sub_result, unique_sorted_matches))
+    if with_contexts:
+        return results    
+    else:
+        if verbose:
+            print('Removing contexts, resorting, and uniquifying...')
+        no_contexts = distinct(sorted(map(lambda t: (t[1],t[3]),
+                                          results)))
+        return no_contexts
+    #lce_with_sub = lce.replace(op, sub) 
+    #result_has_balanced_parens = has_balanced_parens(lce_with_sub)
+    #result_is_wellformed = result_has_balanced_parens
+    #return sub_is_match and result_is_wellformed
 
 
 #####################################################
