@@ -686,7 +686,7 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     If substitution is not None, then this also returns for each match a 
     boolean indicating whether both 
      - the substitution matches the operator
-     - the expression resulting from the substitition is syntactically well-
+     - the expression resulting from the substitution is syntactically well-
        formed.
        - Currently, well-formedness just means that parentheses are balanced in
          the complete expression post-substitution. 
