@@ -17,7 +17,7 @@ For complete details and a description of *all* flags, use the command-line help
 
 #### Checking whether a string matches an uncertainty operator in some glycan
 
-`python -m gregex 'Ma6_M' -s (Ma4)` checks whether `(Ma4)` can be substituted for the operator `_` in `Ma6_M`. It can, so this returns `True` to stdout.
+`python -m gregex 'Ma6_M' -s '(Ma4)'` checks whether `(Ma4)` can be substituted for the operator `_` in `Ma6_M`. It can, so this returns `True` to stdout.
 
 `python -m gregex 'Ma6(Ma4)M' -o '_'` writes a set of lines to stdout indicating all the nonempty subsequences of `Ma6(Ma4)M` that could be replaced with `_` and yield a syntactically well-formed linear code expression.
 
@@ -25,9 +25,11 @@ For complete details and a description of *all* flags, use the command-line help
 	left_context	match	right_context
 for some match. 
 
-`pyhon -m gregex 'Ma6(Ma4)M' -o '_' -s '(Ma2)' -c` is similar to the previous command, but checks for each `(left context, match, right_context)` triple whether `(Ma2)` can successfully match the location of `_` in each possible left-match-right split of the original linear code expression.
+`python -m gregex 'Ma6(Ma4)M' -o '_' -s '(Ma2)' -c` is similar to the previous command, but checks for each `(left context, match, right_context)` triple whether `(Ma2)` can successfully match the location of `_` in each possible left-match-right split of the original linear code expression.
 
 ## Requirements / installation
+
+All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 
 The three most salient dependencies are
  - `funcy`
@@ -36,8 +38,9 @@ The three most salient dependencies are
   - `glypy` does not currently support Python 3.
 
 To set up a new conda environment that contains this repository's dependencies,
-1. `git clone` this repository to a filepath `f` of your choice.
-2. foo
+1. `git clone` this repository to a filepath of your choice.
+2. `cd path_to_repo`
+3. Create the conda environment automatically via the `.yml` file in the repository (`conda env create -f gregex_env.yml`, followed by `conda activate gregex`) *or* enter the commands in `conda_manual_environment_creation.txt` at your command prompt, one at a time.
 
 ## TODO
 

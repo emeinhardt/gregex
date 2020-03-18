@@ -23,7 +23,7 @@ separated columns:
   left context\t match\t right context
 
 If a substitution arg is provided (-s), then this also returns an extra column 
-for each match (a boolean = 1 or 0) indicating whether both of the following 
+for each match (a boolean) indicating whether both of the following 
 conditions hold:
  - the substitution matches the operator
  - the expression resulting from the substitution is syntactically well-formed.
