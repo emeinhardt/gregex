@@ -1,5 +1,5 @@
 # `gregex`
-A parser for **g**lycan **reg**ular **ex**pressions
+A tool for investigating and working with regular-expression like operators that describe glycans.
 
 ## Motivation / context
 
