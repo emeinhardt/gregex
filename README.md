@@ -13,12 +13,36 @@ This package contains functions (and a command-line interface to the main script
 
 ### CLI example usage
 
+For complete details and a description of *all* flags, use the command-line help flag: `python -m gregex -h`.
 
+#### Checking whether a string matches an uncertainty operator in some glycan
+
+`python -m gregex 'Ma6_M' -s (Ma4)` checks whether `(Ma4)` can be substituted for the operator `_` in `Ma6_M`. It can, so this returns `True` to stdout.
+
+`python -m gregex 'Ma6(Ma4)M' -o '_'` writes a set of lines to stdout indicating all the nonempty subsequences of `Ma6(Ma4)M` that could be replaced with `_` and yield a syntactically well-formed linear code expression.
+
+`python -m gregex 'Ma6(Ma4)M' -o '_' -c` is the same, but each line now contains
+	left_context	match	right_context
+for some match. 
+
+`pyhon -m gregex 'Ma6(Ma4)M' -o '_' -s '(Ma2)' -c` is similar to the previous command, but checks for each `(left context, match, right_context)` triple whether `(Ma2)` can successfully match the location of `_` in each possible left-match-right split of the original linear code expression.
+
+## Requirements / installation
+
+The three most salient dependencies are
+ - `funcy`
+ - `glypy` (so far only necessary for development, not for CLI functionality or most other functions)
+ - `Python 2.7`
+  - `glypy` does not currently support Python 3.
+
+To set up a new conda environment that contains this repository's dependencies,
+1. `git clone` this repository to a filepath `f` of your choice.
+2. foo
 
 ## TODO
 
 1. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.
 2. Add additional tests for code unique to `gregex.py` relative to the dev notebook.
 3. Create a clean demo notebook from the existing development notebook.
-4. Create a CLI for converting a linear code representation to an s-expression.
+4. Create a CLI to existing package code for converting a linear code representation to an s-expression.
 
