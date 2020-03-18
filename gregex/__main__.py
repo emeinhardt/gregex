@@ -1,5 +1,5 @@
 import argparse
-import os
+#import os
 
 my_desc = """Examine matches for uncertainty operators in a linear code expression.
 
