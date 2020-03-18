@@ -1,3 +1,8 @@
+'''
+An open-source module that extends some of `glypy`'s functionality to 
+illuminate the behavior of Krambeck et al.'s uncertainty operators.
+'''
+
 from funcy import *
 from itertools import product
 
@@ -853,4 +858,10 @@ def glypy_plottable(linear_code_expression):
         return False
 
 
-#def 
+##############################################
+# Defining package-level executable behavior #
+##############################################
+
+
+#if __name__ == __main__:
+#    print("foo")
