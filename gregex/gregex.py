@@ -667,8 +667,8 @@ def check_match(linear_code_expression, substitution, verbose=False):
         op = '_'
     else:
         op = '|'
-    if verbose:
-        print("Op identified as '{0}'".format(op))
+    #if verbose:
+    #    print("Op identified as '{0}'".format(op))
     my_pred = pred_mapper[op]
 
     sub_is_match = my_pred(sub)
