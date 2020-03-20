@@ -512,6 +512,7 @@ def is_ligand_match(linear_code_expression):
     Indicates whether `linear_code_expression` (in its entirety) matches (i.e.
     could be substituted with/for) `...`.
     '''
+    #print("Checking for ligand match in\n{0}".format(linear_code_expression))
     s = linear_code_expression
     if len(s) == 0:
         return True
@@ -542,6 +543,7 @@ def is_continuation_match(linear_code_expression):
     Indicates whether `linear_code_expression` (in its entirety) matches (i.e.
     could be substituted with/for `_`).
     '''
+    #print("Checking for continuation match in \n{0}".format(linear_code_expression))
     s = linear_code_expression
     if len(s) == 0:
         return True
@@ -721,7 +723,11 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     #              '|':get_possible_branch_point_matches}
     my_pred = pred_mapper[op]
     #my_getter = get_mapper[uncertainty_operator]
-    
+
+    if verbose:
+        print('Operator = {0}'.format(op))
+        print('Predicate = {0}'.format(my_pred))
+
     ligand_ops_present = lce.count('...')
     continuation_ops_present = lce.count('_')
     possible_branch_ops_present = lce.count('|')
@@ -734,7 +740,7 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
 
     if verbose:
         print('Calculating non-empty subsequence matches w/ contexts...')
-    matches = tuple(filter(my_pred,
+    matches = tuple(filter(lambda lmr: my_pred(lmr[1]),
                            generate_subsequences(tokenizer(lce),
                                                  with_contexts=True)))
     if verbose:
