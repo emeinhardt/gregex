@@ -5,8 +5,19 @@ import argparse
 #import os
 from collections import OrderedDict
 import csv
+import sys
 
-my_desc = """Examine matches for uncertainty operators in a linear code expression.
+my_desc = """Manipulate or investigate a linear code expression, principally for
+the purpose of investigating uncertainty operators.
+
+Given
+ - a linear code expression representing a single glycan
+ - the -e flag
+this returns the glycan as a Lisp-style s-expression. This permits seeing the
+tree structure of the glycan without resorting to glypy. (Currently gregex does
+no pretty-printing, but every widely-used text editor supports packages that will
+auto-indent Lisp according to common conventions that make tree structure
+apparent.)
 
 Given
  - a linear code expression representing a single glycan
@@ -45,6 +56,9 @@ parser = argparse.ArgumentParser(description=my_desc,
 parser.add_argument('lce', metavar ='LCE', 
                     type=str, nargs=1, 
                     help='a linear code expression containing no uncertainty operator tokens, or exactly one')
+parser.add_argument('-e', '--sexp',
+                    action='store_true',
+                    help='If active, all other arguments are ignored and the linear code expression is converted into an s-expression')
 parser.add_argument('-o', '--operator', metavar='O',
                     type=str, nargs=1,
                     choices=(None, '...', '_', '|'),
@@ -72,10 +86,15 @@ if args.verbose:
 with_context = args.contexts
 to_excel_fp = args.excel[0] if args.excel is not None else None
 lce = args.lce[0]
+to_sexp = args.sexp
 operator = args.operator
 substitution = args.substitution
 verbose = args.verbose
 colnames = args.namecolumns
+
+if to_sexp:
+    print(gregex.parse_exp(lce, 's-exp'))
+    sys.exit()
 
 if substitution is not None and len(substitution) > 0:
     sub = substitution[0]
