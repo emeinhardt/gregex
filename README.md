@@ -1,5 +1,5 @@
 # `gregex`
-A tool for investigating and working with regular-expression-like operators that describe glycans.
+A tool for investigating and working with regular-expression-like operators that describe glycans in linear code.
 
 ## Motivation / context
 
@@ -23,7 +23,11 @@ For complete details and a description of *all* functionality and flags, use the
 
 #### Converting a linear code representation of a glycan to an s-expression
 
-The [native representation](https://en.wikipedia.org/wiki/S-expression) of code and data in Lisp dialects makes tree and list structure readily apparent, even for longer glycans, particularly when indented according to common conventions.
+While linear code is more compact than more general tree notations when chaining ('unary branching') is more typical than (multi-child) branching, the 'bushier' a glycan is and the more monosaccharides are in the glycan, the harder it will be for a human to see hierarchical structure at a glance and the more likely  they are to make mistakes while reading or editing. 
+`gregex` has (currently somewhat limited) support for exporting a glycan represented in linear code to a notation that makes the tree structure more apparent: 's-expressions'.
+
+This [native representation](https://en.wikipedia.org/wiki/S-expression) of code and data from Lisp dialects makes tree and list structure readily apparent, even for longer glycans, particularly when indented according to common conventions.
+S-expressions ('s-exps') also have a long history of use in natural language parsing for creating human- and machine-readable representations of syntactic trees.
 
 `python -m gregex 'NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e`
 
@@ -31,7 +35,7 @@ The [native representation](https://en.wikipedia.org/wiki/S-expression) of code 
 
 `(GN Fa6 (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4 NNa3)) (GNb2 (Ab4 (GNb3 (Ab4 ANb4 NNa3))))) (Ma3 (GNb2 (Ab4 ANb4 NNa3)) (GNb4 (Ab4 NNa6))))))`
 
-(`gregex` currently doesn't do pretty-printing of s-expressions, but for the time being, any widely-used text editor will support packages that automatically indent s-expressions according to common conventions.)
+(`gregex` currently doesn't do pretty-printing of s-expressions, but for the time being, any widely-used text editor will support packages that automatically indent s-expressions according to common conventions. See the `TODO` item below for how this pretty-printed output would likely appear.)
 
 #### Checking whether a string matches an uncertainty operator in some glycan
 
