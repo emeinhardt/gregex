@@ -340,6 +340,33 @@ def tokenizer(linear_code_expression):
 # Conversion to JSON and s-expressions #
 ########################################
 
+
+def split_bond_information(saccharidue_unit_maybe_with_bond_information):
+    su = saccharidue_unit_maybe_with_bond_information
+    if su in SUs and su not in SUs_with_bonds:
+        return (su, '', '')
+    bond_location = su[-1]
+    assert bond_location in '123456789' #or bond_location in '?'
+    bond_type = su[-2] if su[-2] in 'ab?' and su[:-2] in SUs else ''
+    SU_bare = desuffix(bond_type, desuffix(bond_location, su))
+    return (SU_bare, bond_type, bond_location)
+
+
+def is_chain_in_leftmost_path(tokens):
+    if len(tokens) == 0:
+        return True
+    return all((each in SUs_with_bonds) or (each in SUs) for each in tokens)
+
+
+def is_nonleftmost_branch(tokens):
+    if len(tokens) == 0:
+        return True
+    has_left_paren = tokens[0] == '('
+    has_right_paren = tokens[-1] == ')'
+    balanced = has_balanced_parens(tokens)
+    return has_left_paren and has_right_paren and balanced
+
+
 def destem(tokens):
     if tokens[-1] == ')':
         return tuple([''])
@@ -573,16 +600,22 @@ def get_continuation_matches(linear_code_expression, as_generator=False, with_co
 def is_possible_branch_point_match(linear_code_expression):
     '''
     Indicates whether `linear_code_expression` (in its entirety) matches (i.e.
-    could be substituted with/for) either `` or `(...)`.
+    could be substituted with/for) either `` or `(...)` or `)` or `)(...)`.
     '''
     s = linear_code_expression
     if len(s) == 0:
         return True
+    if len(s) == 1 and s[0] == ')':
+        return True
+
+    if s[0] == ')' and is_possible_branch_point_match(s[1:]):
+        return True
+
     left_edge_is_left_paren = s[0] == '('
     right_edge_is_right_paren = s[-1] == ')'
     center_matches_ligand = is_ligand_match(s[1:-1])
-    return all([left_edge_is_left_paren, 
-                right_edge_is_right_paren, 
+    return all([left_edge_is_left_paren,
+                right_edge_is_right_paren,
                 center_matches_ligand])
 
 
@@ -724,9 +757,9 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     my_pred = pred_mapper[op]
     #my_getter = get_mapper[uncertainty_operator]
 
-    if verbose:
-        print('Operator = {0}'.format(op))
-        print('Predicate = {0}'.format(my_pred))
+    #if verbose:
+    #    print('Operator = {0}'.format(op))
+    #    print('Predicate = {0}'.format(my_pred))
 
     ligand_ops_present = lce.count('...')
     continuation_ops_present = lce.count('_')
@@ -838,29 +871,36 @@ def compare_matches(uncertainty_operator_A, uncertainty_operator_B,
     #                                                          with_contexts=with_contexts) 
     #B_getter = lambda lce: get_mapper[uncertainty_operator_B](lce,
     #                                                          with_contexts=with_contexts) 
-    A_matches = tuple(filter(A_pred,
-                             generate_subsequences(tokenizer(linear_code_expression),
-                                                   with_contexts=with_contexts)))
-    B_matches = tuple(filter(B_pred,
-                             generate_subsequences(tokenizer(linear_code_expression),
-                                                   with_contexts=with_contexts)))
-    #A_matches, A_nonmatches = split(A_pred,
-    #                                generate_subsequences(tokenizer(linear_code_expression),
-    #                                                      with_contexts=with_contexts))
-    #B_matches, B_nonmatches = split(B_pred,
-    #                                generate_subsequences(tokenizer(linear_code_expression),
-    #                                                      with_contexts=with_contexts))
+    #A_matches = tuple(filter(A_pred,
+    #                         generate_subsequences(tokenizer(linear_code_expression),
+    #                                               with_contexts=with_contexts)))
+    #B_matches = tuple(filter(B_pred,
+    #                         generate_subsequences(tokenizer(linear_code_expression),
+    #                                               with_contexts=with_contexts)))
+    extract_from_context = lambda match: match if type(match) == str else match[1]
+    A_matches, A_nonmatches = split(lambda m: A_pred(extract_from_context(m)),
+                                    generate_subsequences(tokenizer(linear_code_expression),
+                                                          with_contexts=with_contexts))
+    B_matches, B_nonmatches = split(lambda m: B_pred(extract_from_context(m)),
+                                    generate_subsequences(tokenizer(linear_code_expression),
+                                                          with_contexts=with_contexts))
     #del A_nonmatches
     #del B_nonmatches
     
-    uniquifier = lambda l: set(map(partial(str_join, ''), l))
+    uniquifier = lambda l: tuple(map(partial(str_join, ''), l))
     if with_contexts:
-        uniquifier_single = deepcopy(uniquifier)
-        uniquifier_match = lambda match: tuple(map(uniquifier_single, match))
+        uniquifier_single = uniquifier
+        uniquifier_match = lambda match: set(map(uniquifier_single, match))
     else:
         uniquifier_match = uniquifier
     A_matches_unique, A_nonmatches_unique = uniquifier_match(A_matches), uniquifier_match(A_nonmatches)
-    #B_matches_unique, B_nonmatches_unique = uniquifier_match(B_matches), uniquifier_match(B_nonmatches)
+    B_matches_unique, B_nonmatches_unique = uniquifier_match(B_matches), uniquifier_match(B_nonmatches)
+
+    #unruly_garbage = [A_matches_unique, A_nonmatches_unique, B_matches_unique, B_nonmatches_unique]
+    #return unruly_garbage
+    #print(map(type, unruly_garbage))
+    #print(map(len, unruly_garbage))
+    #print(unruly_garbage[0])
 
     both = set.intersection(A_matches_unique, B_matches_unique)
     neither = set.union(A_nonmatches_unique, B_nonmatches_unique)
