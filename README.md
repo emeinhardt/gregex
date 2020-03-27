@@ -15,6 +15,8 @@ This package contains functions (and a command-line interface to the main script
 
 ### CLI example usage
 
+Provided the `gregex` module is on your path (via e.g. step 2 of the installation process below), some of the functionality of the `gregex` Python module is available via `gregex -m gregex <ARGS>`. 
+
 All CLI functionality performs some operation on a single glycan linear code expression (the first and main argument to the script). Exactly which operation is dictated by other flags and arguments.
 
 For complete details and a description of *all* functionality and flags, use the command-line help flag: `python -m gregex -h`.
