@@ -61,11 +61,15 @@ While linear code is more compact than more general tree notations when chaining
 [This representation](https://en.wikipedia.org/wiki/S-expression) of code and data native to Lisp dialects makes tree and list structure readily apparent, even for longer glycans, particularly when indented according to common conventions.
 S-expressions ('s-exps') also have a long history of use in natural language parsing for creating human- and machine-readable representations of syntactic trees.
 
-`python -m gregex 'NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e`
+```
+python -m gregex 'NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e
+```
 
 (currently) yields
 
-`(GN Fa6 (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4 NNa3)) (GNb2 (Ab4 (GNb3 (Ab4 ANb4 NNa3))))) (Ma3 (GNb2 (Ab4 ANb4 NNa3)) (GNb4 (Ab4 NNa6))))))`
+```
+(GN Fa6 (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4 NNa3)) (GNb2 (Ab4 (GNb3 (Ab4 ANb4 NNa3))))) (Ma3 (GNb2 (Ab4 ANb4 NNa3)) (GNb4 (Ab4 NNa6))))))
+```
 
 (`gregex` currently doesn't do pretty-printing of s-expressions, but for the time being, any widely-used text editor will support packages that automatically indent s-expressions according to common conventions. See the `TODO` item below for how this pretty-printed output would likely appear.)
 
@@ -87,7 +91,7 @@ for some match.
 
 All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 
-The three most salient dependencies are
+The four most salient dependencies are
  - [`funcy`](https://funcy.readthedocs.io/en/stable/), supporting functional programming.
  - [`nltk`](https://www.nltk.org/), for linear code expression parsing outside of `glypy`.
  - [`glypy`](https://pythonhosted.org/glypy/) (so far only necessary for development, not for CLI functionality or most other functions)
@@ -111,7 +115,7 @@ To set up a new conda environment that contains this repository's dependencies,
 6. Allow for distinct grammars to be loaded or swapped programmatically or specified via file (and supported through the CLI).
 7. Add feature for stricter checking/enforcement of child ordering conventions.
 8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`.
-9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to s-exps, should become something like one of these two examples below
+9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to an s-expression, should become something like one of these two examples below
 
 ```
 (GN Fa6

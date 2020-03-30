@@ -74,6 +74,8 @@ MS_codes.add('GNa')
 
 SUs = MS_codes
 
+SU_bare = {'A', 'AN', 'B', 'E', 'F', 'G', 'GN', 'G[Q]', 'H', 'H[2Q, 4Q]', 'I', 'K', 'L', 'M', 'NG', 'NJ', 'NN', 'NN[9N]', 'N[5Q]', 'O', 'P', 'PH', 'R', 'S', 'U', 'W', 'X'}
+
 bonds = set(map(str, range(1,10)))
 
 bond_type_and_loc = set(map(partial(str_join, ''), 
@@ -82,9 +84,10 @@ bond_type_and_loc = set(map(partial(str_join, ''),
 
 
 SUs_with_bonds = set(map(partial(str_join, ''),
-                         product(SUs,
-                                 bonds)))
-
+                         product(SU_bare,
+                                 bond_type_and_loc)))
+#                         product(SUs,
+#                                 bonds)))
 
 #######################################
 # Bottom up parsing utility functions #
@@ -358,7 +361,8 @@ def tokenizer(linear_code_expression, tokenize_saccharide_units=False):
     units to separate the bare monosaccharide, the bond type, and the bond
     location.
     '''
-    categories = (parentheses, SUs_with_bonds, SUs)
+    # categories = (parentheses, SUs_with_bonds, SUs)
+    categories = (parentheses, SUs_with_bonds, SU_bare)
 
     def right_greedy_tokenizer(lce, tokenized_result_so_far):
         '''
@@ -467,19 +471,22 @@ def wff(lce):
 
 def split_bond_information(saccharidue_unit_maybe_with_bond_information):
     su = saccharidue_unit_maybe_with_bond_information
-    if su in SUs and su not in SUs_with_bonds:
+    if su in SU_bare and su not in SUs_with_bonds:
+    # if su in SUs and su not in SUs_with_bonds:
         return (su, '', '')
     bond_location = su[-1]
-    assert bond_location in '123456789' #or bond_location in '?'
-    bond_type = su[-2] if su[-2] in 'ab?' and su[:-2] in SUs else ''
-    SU_bare = desuffix(bond_type, desuffix(bond_location, su))
-    return (SU_bare, bond_type, bond_location)
+    assert bond_location in '123456789?' #or bond_location in '?'
+    bond_type = su[-2] if su[-2] in 'ab?' and su[:-2] in SU_bare else ''
+    # bond_type = su[-2] if su[-2] in 'ab?' and su[:-2] in SUs else ''
+    SU_alone = desuffix(bond_type, desuffix(bond_location, su))
+    return (SU_alone, bond_type, bond_location)
 
 
 def is_chain_in_rightmost_path(tokens):
     if len(tokens) == 0:
         return True
-    return all((each in SUs_with_bonds) or (each in SUs) for each in tokens)
+    return all((each in SUs_with_bonds) or (each in SU_bare) for each in tokens)
+    # return all((each in SUs_with_bonds) or (each in SUs) for each in tokens)
 
 
 def is_nonrightmost_branch(tokens):
