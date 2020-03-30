@@ -53,6 +53,8 @@ Some other part of `gregex` might support these features on top of parsing event
 
 **NOTE 2:** As you may have noticed, with the exception of bond type/location uncertainty operators, linear code expressions with uncertainty operators are *not* part of this grammar. This is a consequence of their current ad-hoc definition in terms of string-matching. Incorporating them into the parser is possible through ad-hoc hacks and further research clarifying their meaning. 
 
+**NOTE 3:** For longer linear code expressions (e.g. the large glycan example elsewhere on this page), current code may need a few tens of GB and a few minutes to calculate well-formedness. While this is not a problem for servers commonly used in scientific computing, it may not be practical for use on a researcher's personal laptop. Since NLTK is largely a research and pedagogically-oriented library, a more performant parser could easily improve on this.
+
 #### Converting a linear code representation of a glycan to an s-expression
 
 While linear code is more compact than more general tree notations when chaining ('unary branching') is more typical than (multi-child) branching, the 'bushier' a glycan is and the more monosaccharides are in the glycan, the harder it will be for a human to see hierarchical structure at a glance and the more likely they are to make mistakes while reading or editing. 
@@ -98,6 +100,7 @@ The four most salient dependencies are
  - `Python 2.7`
     - `glypy` does not currently support Python 3.
         - `gregex` should otherwise be Python 3 compatible.
+    - Note that nearly every direction for further development of this package depends on third-party packages that have at best limited support for Python 2.
 
 To set up a new conda environment that contains this repository's dependencies,
 1. `git clone` this repository to a filepath of your choice.
@@ -114,8 +117,9 @@ To set up a new conda environment that contains this repository's dependencies,
 5. Qualify imports in `gregex.py` to avoid polluting user namespace when `gregex` is imported as a module. 
 6. Allow for distinct grammars to be loaded or swapped programmatically or specified via file (and supported through the CLI).
 7. Add feature for stricter checking/enforcement of child ordering conventions.
-8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`.
-9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to an s-expression, should become something like one of these two examples below
+8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`. Note that both directions will likely have limited support for Python 2.
+9. Replace the parsing backend with something more efficient. There are many options here; ideally whatever is chosen should support more expressive grammars (e.g. left-recursive rules). 
+10. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to an s-expression, should become something like one of these two examples below
 
 ```
 (GN Fa6
