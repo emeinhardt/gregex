@@ -113,23 +113,27 @@ To set up a new conda environment that contains this repository's dependencies,
 8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`.
 9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to s-exps, should become something like one of these two examples below
 
-```(GN Fa6
+```
+(GN Fa6
     (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
                                NNa3))
                     (GNb2 (Ab4 (GNb3 (Ab4 ANb4
                                           NNa3)))))
                (Ma3 (GNb2 (Ab4 ANb4
                                NNa3))
-                    (GNb4 (Ab4 NNa6))))))```
+                    (GNb4 (Ab4 NNa6))))))
+```
 
-```(GN :a6 F
+```
+(GN :a6 F
     :b4 (GN :a4 (M :a6 (M :b6 (GN :b4 (A :b4 AN
                                          :a3 NN))
                           :b4 (GN :b4 (A :b3 (GN :b4 (A :b4 AN
                                                         :a3 NN)))))
                    :a3 (M :b2 (GN :b4 (A :b4 AN
                                          :a3 NN))
-                          :b4 (GN :b4 (A :a6 NN))))))```
+                          :b4 (GN :b4 (A :a6 NN))))))
+```
 
 [`hy`](https://docs.hylang.org/en/stable/) plausibly has pretty-printing facilities that support this out-of-the-box.
 
