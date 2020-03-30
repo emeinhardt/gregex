@@ -27,13 +27,21 @@ For complete details and a description of *all* functionality and flags, use the
 
 `
 exp ⟶ subexp non_main_branch+ stem | stem | λ
+
 stem ⟶ SU_with_bond_info* SU_bare
+
 non_main_branch ⟶ '(' subexp ')'
+
 subexp ⟶ substem | subexp non_main_branch+ substem
+
 substem ⟶ SU_with_bond_info+
+
 SU_with_bond_info ⟶ SU_bare bond_type bond_location
+
 bond_type ⟶ 'a' | 'b' | '?'
+
 bond_location ⟶ '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '?'
+
 SU_bare ⟶ 'A' | 'AN' | 'B' | 'E' | 'F' | 'G' | 'GN' | 'G[Q]' | 'H' | 'H[2Q, 4Q]' | 'I' | 'K' | 'L' | 'M' | 'NG' | 'NJ' | 'NN' | 'NN[9N]' | 'N[5Q]' | 'O' | 'P' | 'PH' | 'R' | 'S' | 'U' | 'W' | 'X'
 `
 
@@ -113,21 +121,35 @@ To set up a new conda environment that contains this repository's dependencies,
 9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to s-exps, should become something like one of these two examples below
 
 `(GN Fa6
+
     (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
+    
                                NNa3))
+                               
                     (GNb2 (Ab4 (GNb3 (Ab4 ANb4
+
                                           NNa3)))))
+
                (Ma3 (GNb2 (Ab4 ANb4
+
                                NNa3))
+
                     (GNb4 (Ab4 NNa6))))))`
 
 `(GN :a6 F
+
     :b4 (GN :a4 (M :a6 (M :b6 (GN :b4 (A :b4 AN
+
                                          :a3 NN))
+
                           :b4 (GN :b4 (A :b3 (GN :b4 (A :b4 AN
+
                                                         :a3 NN)))))
+
                    :a3 (M :b2 (GN :b4 (A :b4 AN
+
                                          :a3 NN))
+
                           :b4 (GN :b4 (A :a6 NN))))))`
 
 [`hy`](https://docs.hylang.org/en/stable/) plausibly has pretty-printing facilities that support this out-of-the-box.
