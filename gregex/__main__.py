@@ -1,4 +1,4 @@
-from funcy import *
+from funcy import str_join
 import gregex
 
 import argparse
@@ -12,7 +12,16 @@ the purpose of investigating uncertainty operators.
 
 Given
  - a linear code expression representing a single glycan
- - the -e flag
+   - (Uncertainty operators for bond type or location are also supported,
+     currently.)
+ - and *no* other flags (except optionally -v)
+this returns a Boolean indicating whether the linear code expression is well-
+formed according to the grammar in the module README. (Future versions may
+support choosing other grammars or user-provided ones.)
+
+Given
+ - a linear code expression representing a single glycan
+ - the -e flag (and optionally -v)
 this returns the glycan as a Lisp-style s-expression. This permits seeing the
 tree structure of the glycan without resorting to glypy. (Currently gregex does
 no pretty-printing, but every widely-used text editor supports packages that will
@@ -21,6 +30,8 @@ apparent.)
 
 Given
  - a linear code expression representing a single glycan
+   - (Uncertainty operators for bond type or location are also supported,
+     currently.)
  - one of Krambeck et al. 2009's uncertainty operators ('...', '_', '|')
 this returns a stream of lines (by default) representing information about
 nonempty subsequences of the glycan that match the uncertainty operator.
@@ -104,6 +115,12 @@ if operator is not None and len(operator) > 0:
     op = operator[0]
 else:
     op = None
+
+if (not to_sexp) and (op is None and sub is None and not with_context):
+    if verbose:
+        print('Checking if linear code expression is well-formed...')
+    print(gregex.wff(lce))
+    sys.exit()
 
 bool_mapper = {True:1, False:0}
 

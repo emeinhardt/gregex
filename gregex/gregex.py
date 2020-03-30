@@ -3,13 +3,17 @@ An open-source module that extends some of `glypy`'s functionality to
 illuminate the behavior of Krambeck et al.'s uncertainty operators.
 '''
 
+#str_join, what else???
 from funcy import *
+
 from itertools import product
 
 from copy import deepcopy
 
 from collections import OrderedDict
 from json import dumps
+
+import nltk
 
 import glypy
 #from glypy.plot import plot
@@ -299,7 +303,44 @@ def deinfix(u, s, infix_not_found_behavior='identity'):
     return just_contexts
 
 
-def tokenizer(linear_code_expression):
+# def tokenizer(linear_code_expression):
+#     '''
+#     Given a linear code expression for a single molecule s, splits ('tokenizes')
+#     s into 'tokens' with each token consisting of one of
+#         - parentheses
+#         - a saccharide unit with bond information
+#         - a saccharide unit/monosaccharide
+#     where 'a monosaccharide with bond information' is either
+#         - a monosaccharide with just a bond type
+#         - a monosaccharide with a bond type and a bond location
+
+#     (Note that it is NOT the job of a tokenizer to enforce or check either
+#     syntactic or semantic restrictions.)
+#     '''
+#     categories = (parentheses, SUs_with_bonds, SUs)
+
+#     def right_greedy_tokenizer(lce, tokenized_result_so_far):
+#         '''
+#         Greedily (and recursively) tokenizes lce from the right.
+#         '''
+#         if lce == '':
+#             return tokenized_result_so_far
+# #         print('lce={0}'.format(lce))
+#         for suf in generate_suffixes(lce, True):
+# #             print('\tsuf={0}'.format(suf))
+#             for cat in categories:
+# #                 print('\t\tcat={0}'.format(cat))
+#                 if suf in cat:
+#                     rest = desuffix(suf, lce)
+# #                     print('\t\trest={0}'.format(rest))
+#                     return right_greedy_tokenizer(rest, [suf] +
+#                                                          tokenized_result_so_far)
+#         e = 'Tokenized portion: {0}\nUntokenized remainder: {1}'
+#         raise Exception(e.format(tokenized_result_so_far, lce))
+#     return right_greedy_tokenizer(linear_code_expression, [])
+
+
+def tokenizer(linear_code_expression, tokenize_saccharide_units=False):
     '''
     Given a linear code expression for a single molecule s, splits ('tokenizes')
     s into 'tokens' with each token consisting of one of
@@ -312,6 +353,10 @@ def tokenizer(linear_code_expression):
 
     (Note that it is NOT the job of a tokenizer to enforce or check either
     syntactic or semantic restrictions.)
+
+    If tokenize_saccharide_units is True, then this will tokenize saccharide
+    units to separate the bare monosaccharide, the bond type, and the bond
+    location.
     '''
     categories = (parentheses, SUs_with_bonds, SUs)
 
@@ -333,7 +378,86 @@ def tokenizer(linear_code_expression):
                                                          tokenized_result_so_far)
         e = 'Tokenized portion: {0}\nUntokenized remainder: {1}'
         raise Exception(e.format(tokenized_result_so_far, lce))
-    return right_greedy_tokenizer(linear_code_expression, [])
+
+    result = right_greedy_tokenizer(linear_code_expression, [])
+    if not tokenize_saccharide_units:
+        return result
+
+    def SU_tokenizer(token):
+        if token in parentheses:
+            return [token]
+        result = list(filter(lambda x: x != '',
+                             list(split_bond_information(token))))
+        return result
+
+    further_tokenized = list(cat(map(SU_tokenizer,
+                                     result)))
+    return further_tokenized
+
+
+###################################
+# Parsing linear code expressions #
+###################################
+
+
+# A right-to-left, uncertainty-operator-free(ish) grammar of
+# linear code expressions.
+
+# simulating the Kleene plus and star via left-recursive rules
+# and the identities
+#  X* = XP -> '' | XP X
+#  X+ = XP -> X  | XP X
+RTF_UOF_g = nltk.CFG.fromstring("""
+    exp -> subexp non_main_branch_phrase stem | stem | empty
+    stem -> SU_with_bond_info_phrase_star SU_bare
+    non_main_branch_phrase -> non_main_branch_phrase non_main_branch | empty
+    non_main_branch -> '(' subexp ')'
+    subexp -> subexp non_main_branch_phrase substem | substem
+    substem -> SU_with_bond_info_phrase_plus
+    SU_with_bond_info_phrase_star -> SU_with_bond_info_phrase_star SU_with_bond_info | empty
+    SU_with_bond_info_phrase_plus -> SU_with_bond_info_phrase_star SU_with_bond_info | SU_with_bond_info
+    SU_with_bond_info -> SU_bare bond_type bond_location
+    bond_type -> 'a' | 'b' | '?'
+    bond_location -> '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '?'
+    SU_bare -> 'A' | 'AN' | 'B' | 'E' | 'F' | 'G' | 'GN' | 'G[Q]' | 'H' | 'H[2Q, 4Q]' | 'I' | 'K' | 'L' | 'M' | 'NG' | 'NJ' | 'NN' | 'NN[9N]' | 'N[5Q]' | 'O' | 'P' | 'PH' | 'R' | 'S' | 'U' | 'W' | 'X'
+    empty ->
+""")
+
+RTF_UOF_g_parser = nltk.parse.chart.ChartParser(RTF_UOF_g)
+
+
+def get_parses(lce):
+    '''
+    Given a linear code expression with no uncertainty operators (except
+    potentially for bond type and/or bond location), this returns a generator
+    yielding all parses for the expression.
+
+    In the future, this may support linear code expressions containing more
+    uncertainty operators.
+    '''
+    tokenized_lce = tokenizer(lce, True)
+    #print(tokenized_lce)
+    parse_generator = RTF_UOF_g_parser.parse(tokenized_lce)
+    return parse_generator
+
+
+def wff(lce):
+    '''
+    Given a linear code expression with no uncertainty operators (except
+    potentially for bond type and/or bond location), this returns a Boolean
+    indicating whether or not the expression has any parses = whether or not
+    the expression is a well-formed formula according to the current grammar.
+
+    In the future, this may support linear code expressions containing more
+    uncertainty operators.
+    '''
+    try:
+        first_parse = get_parses(lce).next()
+        return True
+    except StopIteration:
+        # for tree in get_parses(lce):
+        #     print(tree)
+        return False
 
 
 ########################################
@@ -352,13 +476,13 @@ def split_bond_information(saccharidue_unit_maybe_with_bond_information):
     return (SU_bare, bond_type, bond_location)
 
 
-def is_chain_in_leftmost_path(tokens):
+def is_chain_in_rightmost_path(tokens):
     if len(tokens) == 0:
         return True
     return all((each in SUs_with_bonds) or (each in SUs) for each in tokens)
 
 
-def is_nonleftmost_branch(tokens):
+def is_nonrightmost_branch(tokens):
     if len(tokens) == 0:
         return True
     has_left_paren = tokens[0] == '('
@@ -377,30 +501,30 @@ def destem(tokens):
     return stem, rest
 
 
-def get_rightmost_branch(nonleftmost_subtrees_as_token_seq):
-    s = nonleftmost_subtrees_as_token_seq
+def get_leftmost_branch(nonrightmost_subtrees_as_token_seq):
+    s = nonrightmost_subtrees_as_token_seq
     end_of_first_branch = len(s)
     for i in range(len(s)-1,-1,-1):
-        if s[i] == '(' and is_nonleftmost_branch(s[i:]):
+        if s[i] == '(' and is_nonrightmost_branch(s[i:]):
             return s[i:]
-    raise Exception('Does not have a well-formed rightmost branch:\n{0}'.format(nonleftmost_subtrees_as_token_seq))
+    raise Exception('Does not have a well-formed leftmost branch:\n{0}'.format(nonrightmost_subtrees_as_token_seq))
     
     
-def parse_nonleftmost_branches(nonleftmost_subtrees_as_token_seq):
-    s = nonleftmost_subtrees_as_token_seq
+def parse_nonrightmost_branches(nonrightmost_subtrees_as_token_seq):
+    s = nonrightmost_subtrees_as_token_seq
     
     #fixme convert this tail-recursive function to an iterative function...
-    def split_nonleftmost_branch_helper(remainder, acc):
+    def split_nonrightmost_branch_helper(remainder, acc):
         if len(remainder) == 0:
             return acc, remainder
         elif remainder[-1] != ')':
             return acc, remainder
-        rightmost_branch = get_rightmost_branch(remainder)
-        new_remainder = desuffix(rightmost_branch, remainder)
-        new_acc = acc + [rightmost_branch]
-        return split_nonleftmost_branch_helper(new_remainder, new_acc)
+        leftmost_branch = get_leftmost_branch(remainder)
+        new_remainder = desuffix(leftmost_branch, remainder)
+        new_acc = acc + [leftmost_branch]
+        return split_nonrightmost_branch_helper(new_remainder, new_acc)
     
-    grouped_branches, tail = split_nonleftmost_branch_helper(s, [])
+    grouped_branches, tail = split_nonrightmost_branch_helper(s, [])
     unwrapped_groups = tuple(map(unwrap_branch_tokens, grouped_branches))
     parsed_groups = tuple(map(parse_tokens, unwrapped_groups))
     parsed_tail = parse_tokens(tail)
@@ -415,8 +539,8 @@ def unwrap_branch_tokens(branch_tokens):
 
 
 def parse_subtrees(rest_tokens):
-    parsed_nonleftmost_subtrees = parse_nonleftmost_branches(rest_tokens)
-    result = parsed_nonleftmost_subtrees
+    parsed_nonrightmost_subtrees = parse_nonrightmost_branches(rest_tokens)
+    result = parsed_nonrightmost_subtrees
     return result
 
     
@@ -424,7 +548,7 @@ def parse_exp(linear_code_expression, style='stem-and-subtrees'):
     '''
     Converts `linear_code_expression` formatted according to this BNF rule 
     (assuming leftward-ascending normal form):
-      (exp) non-leftmost-branch* stem <- exp
+      (exp) non-rightmost-branch* stem <- exp
     as a dictionary (with ordering within sequences going from left-to-right).
     '''
     tokens = tokenizer(linear_code_expression)
@@ -465,17 +589,17 @@ def stem_to_func_and_args(stem):
 #     return {'func':stem[0], 'args':tuple([stem_to_func_and_args(stem[1:])])}
     
     
-def rightmost_leaf(fa_tree):
+def leftmost_leaf(fa_tree):
     t = fa_tree
     if len(t['args']) == 0:
         return t
-    return rightmost_leaf(t['args'][-1])
+    return leftmost_leaf(t['args'][-1])
     
     
 def stem_and_subtrees_to_func_and_args(stem_and_subtrees):
     stem_fa = stem_to_func_and_args(stem_and_subtrees['stem'])
-    my_rightmost_leaf = rightmost_leaf(stem_fa)
-    my_rightmost_leaf['args'] = list(map(stem_and_subtrees_to_func_and_args,
+    my_leftmost_leaf = leftmost_leaf(stem_fa)
+    my_leftmost_leaf['args'] = list(map(stem_and_subtrees_to_func_and_args,
                                          stem_and_subtrees['subtrees']))
     return stem_fa
 

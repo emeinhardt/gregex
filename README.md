@@ -1,5 +1,5 @@
 # `gregex`
-A tool for investigating and working with regular-expression-like operators that describe glycans in linear code.
+A tool for investigating and working with regular-expression-like operators that describe glycans in linear code. Currently an alpha release.
 
 ## Motivation / context
 
@@ -21,12 +21,43 @@ All CLI functionality performs some operation on a single glycan linear code exp
 
 For complete details and a description of *all* functionality and flags, use the command-line help flag: `python -m gregex -h`.
 
+#### Checking syntactic well-formedness of linear code representations
+
+`python -m gregex 'Ma6(Ma4)M'` returns a boolean indicating the linear code expression is well-formed or not according to the following [context-free grammar](https://en.wikipedia.org/wiki/Context-free_grammar): 
+
+`
+exp ⟶ subexp non_main_branch+ stem | stem | λ
+stem ⟶ SU_with_bond_info* SU_bare
+non_main_branch ⟶ '(' subexp ')'
+subexp ⟶ substem | subexp non_main_branch+ substem
+substem ⟶ SU_with_bond_info+
+SU_with_bond_info ⟶ SU_bare bond_type bond_location
+bond_type ⟶ 'a' | 'b' | '?'
+bond_location ⟶ '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '?'
+SU_bare ⟶ 'A' | 'AN' | 'B' | 'E' | 'F' | 'G' | 'GN' | 'G[Q]' | 'H' | 'H[2Q, 4Q]' | 'I' | 'K' | 'L' | 'M' | 'NG' | 'NJ' | 'NN' | 'NN[9N]' | 'N[5Q]' | 'O' | 'P' | 'PH' | 'R' | 'S' | 'U' | 'W' | 'X'
+`
+
+where
+ - `⟶`, `|`, `λ` , `*`, and `+` are all reserved and/or metalinguistic symbols with their usual formal-language theoretic meaning (see any textbook or introductory material for reference).
+ - all terminal symbols are quoted string literals, except for the empty string.
+ - the enumeration of saccharide units is taken from a relatively arbitrary mix of what `glypy` supports and what `glymmer` supports.
+
+Note that this is a declarative specification of what linear code expressions are that represent a single glycan or a set of glycans (via the uncertainty operators about bond type and position). See e.g. [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) for more on why specifications like this are common.
+
+**NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. It is *not* the job of a parser to check or enforce things like:
+ - syntactic *conventions* about the linear ordering of children
+ - whether a linear code representation describes something physically possible (= the *denonational semantics* of linear code).
+
+Some other part of `gregex` might support these features on top of parsing eventually, but for now they are absent. (`glypy` might support some aspects of the second feature.) 
+
+**NOTE 2:** As you may have noticed, with the exception of bond type/location uncertainty operators, linear code expressions with uncertainty operators are *not* part of this grammar. This is a consequence of their current ad-hoc definition in terms of string-matching. Incorporating them into the parser is possible through ad-hoc hacks and further research clarifying their meaning. 
+
 #### Converting a linear code representation of a glycan to an s-expression
 
-While linear code is more compact than more general tree notations when chaining ('unary branching') is more typical than (multi-child) branching, the 'bushier' a glycan is and the more monosaccharides are in the glycan, the harder it will be for a human to see hierarchical structure at a glance and the more likely  they are to make mistakes while reading or editing. 
+While linear code is more compact than more general tree notations when chaining ('unary branching') is more typical than (multi-child) branching, the 'bushier' a glycan is and the more monosaccharides are in the glycan, the harder it will be for a human to see hierarchical structure at a glance and the more likely they are to make mistakes while reading or editing. 
 `gregex` has (currently somewhat limited) support for exporting a glycan represented in linear code to a notation that makes the tree structure more apparent: 's-expressions'.
 
-This [native representation](https://en.wikipedia.org/wiki/S-expression) of code and data from Lisp dialects makes tree and list structure readily apparent, even for longer glycans, particularly when indented according to common conventions.
+[This representation](https://en.wikipedia.org/wiki/S-expression) of code and data native to Lisp dialects makes tree and list structure readily apparent, even for longer glycans, particularly when indented according to common conventions.
 S-expressions ('s-exps') also have a long history of use in natural language parsing for creating human- and machine-readable representations of syntactic trees.
 
 `python -m gregex 'NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e`
@@ -56,10 +87,12 @@ for some match.
 All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 
 The three most salient dependencies are
- - [`funcy`](https://funcy.readthedocs.io/en/stable/)
+ - [`funcy`](https://funcy.readthedocs.io/en/stable/), supporting functional programming.
+ - [`nltk`](https://www.nltk.org/), for linear code expression parsing outside of `glypy`.
  - [`glypy`](https://pythonhosted.org/glypy/) (so far only necessary for development, not for CLI functionality or most other functions)
  - `Python 2.7`
     - `glypy` does not currently support Python 3.
+        - `gregex` should otherwise be Python 3 compatible.
 
 To set up a new conda environment that contains this repository's dependencies,
 1. `git clone` this repository to a filepath of your choice.
@@ -68,11 +101,17 @@ To set up a new conda environment that contains this repository's dependencies,
 
 ## TODO
 
+0. Update conda env to reflect `nltk` dependency.
 1. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.
-2. Add additional tests for code unique to `gregex.py` relative to the dev notebook.
+2. Add additional tests for code unique to `gregex.py` relative to the dev notebook (e.g. make sure parser recognizes every uncertainty-operator-free linear code expression you can find).
 3. Create a clean demo notebook from the existing development notebook.
-4. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example: 
-   
+4. Setup `readthedocs` documentation.
+5. Qualify imports in `gregex.py` to avoid polluting user namespace when `gregex` is imported as a module. 
+6. Allow for distinct grammars to be loaded or swapped programmatically or specified via file (and supported through the CLI).
+7. Add feature for stricter checking/enforcement of child ordering conventions.
+8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`.
+9. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to s-exps, should become something like one of these two examples below
+
 `(GN Fa6
     (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
                                NNa3))
