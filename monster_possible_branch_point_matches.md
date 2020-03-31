@@ -1,0 +1,16 @@
+Left                                                                                        |Match                                           |Right
+:-------------------------------------------------------------------------------------------|:-----------------------------------------------|:------------------------------------------------------------------------------------
+NNa3                                                                                        |(ANb4)                                          |Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4                                                                                   |)                                               |Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2                                                                           |(NNa6Ab4GNb4)                                   |Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4                                                               |)                                               |Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3                                                           |(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)|Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3                                                      |(ANb4)                                          |Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4                                                 |)                                               |Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2                                  |(NNa3(ANb4)Ab4GNb6)                             |Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3                             |(ANb4)                                          |Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4                        |)                                               |Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6                |)                                               |Ma6)Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6            |)                                               |Ma4GNb4(Fa6)GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4    |(Fa6)                                           |GN
+NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6|)                                               |GN

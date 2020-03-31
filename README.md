@@ -64,13 +64,13 @@ While linear code is more compact than more general tree notations when chaining
 S-expressions ('s-exps') also have a long history of use in natural language parsing for creating human- and machine-readable representations of syntactic trees.
 
 ```
-python -m gregex 'NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e
+python -m gregex 'NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN' -e
 ```
 
 (currently) yields
 
 ```
-(GN Fa6 (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4 NNa3)) (GNb2 (Ab4 (GNb3 (Ab4 ANb4 NNa3))))) (Ma3 (GNb2 (Ab4 ANb4 NNa3)) (GNb4 (Ab4 NNa6))))))
+(GN Fa6 (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4 NNa3)) (GNb2 (Ab4 (GNb3 (Ab4 ANb4 NNa3))))) (Ma3 (GNb4 (Ab4 NNa6)) (GNb2 (Ab4 ANb4 NNa3))))))
 ```
 
 (`gregex` currently doesn't do pretty-printing of s-expressions, but for the time being, any widely-used text editor will support packages that automatically indent s-expressions according to common conventions. See the `TODO` item below for how this pretty-printed output would likely appear.)
@@ -180,17 +180,17 @@ Ab4GNb2(Ab4GNb4)|Ma3                |
 7. Add feature for stricter checking/enforcement of child ordering conventions.
 8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`. Note that both directions will likely have limited support for Python 2.
 9. Replace the parsing backend with something more efficient. There are many options here; ideally whatever is chosen should support more expressive grammars (e.g. left-recursive rules). 
-10. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa6Ab4GNb4(NNa3(ANb4)Ab4GNb2)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to an s-expression, should become something like one of these two examples below
+10. Add pretty-printing support to s-expression conversion and make argument labels (=bond information) more explicit. For example, `NNa3(ANb4)Ab4GNb2(NNa6Ab4GNb4)Ma3(NNa3(ANb4)Ab4GNb3Ab4GNb2(NNa3(ANb4)Ab4GNb6)Ma6)Ma4GNb4(Fa6)GN`, when converted to an s-expression, should become something like one of these two examples below
 
 ```
 (GN Fa6
-    (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
-                               NNa3))
-                    (GNb2 (Ab4 (GNb3 (Ab4 ANb4
-                                          NNa3)))))
-               (Ma3 (GNb2 (Ab4 ANb4
-                               NNa3))
-                    (GNb4 (Ab4 NNa6))))))
+│   (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
+│   │                          NNa3))
+│   │               (GNb2 (Ab4 (GNb3 (Ab4 ANb4
+│   │               │                     NNa3)))))
+│   │          (Ma3 (GNb4 (Ab4 NNa6))
+│   │          │    (GNb2 (Ab4 ANb4
+│   │          │    │          NNa3))))))
 ```
 
 ```
@@ -199,9 +199,9 @@ Ab4GNb2(Ab4GNb4)|Ma3                |
                                          :a3 NN))
                           :b4 (GN :b4 (A :b3 (GN :b4 (A :b4 AN
                                                         :a3 NN)))))
-                   :a3 (M :b2 (GN :b4 (A :b4 AN
-                                         :a3 NN))
-                          :b4 (GN :b4 (A :a6 NN))))))
+                   :a3 (M :b4 (GN :b4 (A :a6 NN))
+                          :b2 (GN :b4 (A :b4 AN
+                                         :a3 NN))))))
 ```
 
 [`hy`](https://docs.hylang.org/en/stable/) plausibly has pretty-printing facilities that support this out-of-the-box.
