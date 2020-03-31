@@ -184,13 +184,13 @@ Ab4GNb2(Ab4GNb4)|Ma3                |
 
 ```
 (GN Fa6
-│   (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
-│   │                          NNa3))
-│   │               (GNb2 (Ab4 (GNb3 (Ab4 ANb4
-│   │               │                     NNa3)))))
-│   │          (Ma3 (GNb4 (Ab4 NNa6))
-│   │          │    (GNb2 (Ab4 ANb4
-│   │          │    │          NNa3))))))
+    (GNb4 (Ma4 (Ma6 (GNb6 (Ab4 ANb4
+                               NNa3))
+                    (GNb2 (Ab4 (GNb3 (Ab4 ANb4
+                                          NNa3)))))
+               (Ma3 (GNb4 (Ab4 NNa6))
+                    (GNb2 (Ab4 ANb4
+                               NNa3))))))
 ```
 
 ```
