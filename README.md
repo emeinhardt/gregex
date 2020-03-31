@@ -107,6 +107,68 @@ To set up a new conda environment that contains this repository's dependencies,
 2. `cd path_to_repo`
 3. Create the conda environment automatically via the `.yml` file in the repository (`conda env create -f gregex_env.yml`, followed by `conda activate gregex`) *or* enter the commands in `conda_manual_environment_creation.txt` at your command prompt, one at a time.
 
+### Optional/complementary packages
+
+[`csvtk`](https://bioinf.shenwei.me/csvtk) lets you manipulate tab-separated output of `gregex` at the command line; for example: 
+
+```
+$ python -m gregex 'Ab4GNb2(Ab4GNb4)Ma3' -o '|' -c | csvtk tab2csv -H -t | csvtk add-header -n Left,Match,Right | csvtk csv2md
+Left           |Match    |Right
+:--------------|:--------|:----
+Ab4GNb2        |(Ab4GNb4)|Ma3
+Ab4GNb2(Ab4GNb4|)        |Ma3
+
+
+$ alias matches2md='csvtk tab2csv -H -t | csvtk add-header -n Left,Match,Right | csvtk csv2md'
+$ python -m gregex 'Ab4GNb2(Ab4GNb4)Ma3' -o '|' -c | matches2md
+ Left           |Match    |Right
+:--------------|:--------|:----
+Ab4GNb2        |(Ab4GNb4)|Ma3
+Ab4GNb2(Ab4GNb4|)        |Ma3
+
+
+$ python -m gregex 'Ab4GNb2(Ab4GNb4)Ma3' -o '...' -c | csvtk tab2csv -H -t | csvtk add-header -n Left,Match,Right | csvtk csv2md
+Left            |Match              |Right
+:---------------|:------------------|:---------------
+                |Ab4                |GNb2(Ab4GNb4)Ma3
+                |Ab4GNb2            |(Ab4GNb4)Ma3
+                |Ab4GNb2(Ab4GNb4)   |Ma3
+                |Ab4GNb2(Ab4GNb4)Ma3|
+Ab4             |GNb2               |(Ab4GNb4)Ma3
+Ab4             |GNb2(Ab4GNb4)      |Ma3
+Ab4             |GNb2(Ab4GNb4)Ma3   |
+Ab4GNb2         |(Ab4GNb4)          |Ma3
+Ab4GNb2         |(Ab4GNb4)Ma3       |
+Ab4GNb2(        |Ab4                |GNb4)Ma3
+Ab4GNb2(        |Ab4GNb4            |)Ma3
+Ab4GNb2(Ab4     |GNb4               |)Ma3
+Ab4GNb2(Ab4GNb4)|Ma3                |
+
+
+$ python -m gregex 'Ab4GNb2(Ab4GNb4)Ma3' -o '_' -c | csvtk tab2csv -H -t | csvtk add-header -n Left,Match,Right | csvtk csv2md
+Left            |Match              |Right
+:---------------|:------------------|:---------------
+                |Ab4                |GNb2(Ab4GNb4)Ma3
+                |Ab4GNb2            |(Ab4GNb4)Ma3
+                |Ab4GNb2(Ab4GNb4)   |Ma3
+                |Ab4GNb2(Ab4GNb4)Ma3|
+Ab4             |GNb2               |(Ab4GNb4)Ma3
+Ab4             |GNb2(Ab4GNb4)      |Ma3
+Ab4             |GNb2(Ab4GNb4)Ma3   |
+Ab4GNb2         |(Ab4GNb4)          |Ma3
+Ab4GNb2         |(Ab4GNb4)Ma3       |
+Ab4GNb2(        |Ab4                |GNb4)Ma3
+Ab4GNb2(        |Ab4GNb4            |)Ma3
+Ab4GNb2(        |Ab4GNb4)           |Ma3
+Ab4GNb2(        |Ab4GNb4)Ma3        |
+Ab4GNb2(Ab4     |GNb4               |)Ma3
+Ab4GNb2(Ab4     |GNb4)              |Ma3
+Ab4GNb2(Ab4     |GNb4)Ma3           |
+Ab4GNb2(Ab4GNb4 |)                  |Ma3
+Ab4GNb2(Ab4GNb4 |)Ma3               |
+Ab4GNb2(Ab4GNb4)|Ma3                |
+```
+
 ## TODO
 
 1. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.

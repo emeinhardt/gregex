@@ -16,7 +16,7 @@ from json import dumps
 import nltk
 
 import glypy
-#from glypy.plot import plot
+from glypy.plot import plot
 import glypy.io.linear_code
 
 
@@ -859,7 +859,8 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
 
     If with_context is False (and no substitution is provided), returns a sorted
     tuple containing the unique substrings of the glycan that match the  
-    operator. Otherwise, returns an analogous tuple of 3-tuples of the form 
+    operator. Otherwise, returns an (unsorted, but otherwise) analogous tuple of
+    3-tuples of the form
         (left context, match, right context)
 
     If substitution is not None, then this also returns for each match a 
@@ -907,14 +908,17 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
     matches = tuple(filter(lambda lmr: my_pred(lmr[1]),
                            generate_subsequences(tokenizer(lce),
                                                  with_contexts=True)))
-    if verbose:
-        print('Sorting...')
+    # if verbose:
+    #     print('Sorting...')
+    # sorted_matches = tuple(map(lambda match: tuple(map(tuple, match)),
+    #                            sorted(matches, key=lambda tup: tup[1])))
+    # if verbose:
+    #     print('Removing duplicates (including contexts)...')
+    # unique_sorted_matches = distinct(sorted_matches)
     sorted_matches = tuple(map(lambda match: tuple(map(tuple, match)),
-                               sorted(matches, key=lambda tup: tup[1])))
-    if verbose:
-        print('Removing duplicates (including contexts)...')
-    unique_sorted_matches = distinct(sorted_matches)
-    
+                               matches))
+    unique_sorted_matches = list(sorted_matches)
+
     detokenize = lambda match_col: str_join('', match_col)
     #columnify = lambda match_cols: str_join('\t', match_cols)
 
@@ -924,7 +928,7 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
             return tuple(map(readable, unique_sorted_matches)) 
         else:
             if verbose:
-                print('Removing contexts, resorting, and uniquifying...')
+                print('Removing contexts, sorting, and uniquifying...')
             no_contexts = distinct(sorted(map(lambda t: t[1],
                                               unique_sorted_matches)))
             readable = lambda match: detokenize(match)
@@ -950,15 +954,10 @@ def analyze_matches(linear_code_expression, uncertainty_operator,
         #return tuple(map(readable, results))    
     else:
         if verbose:
-            print('Removing contexts, resorting, and uniquifying...')
+            print('Removing contexts, sorting, and uniquifying...')
         no_contexts = distinct(sorted(map(lambda t: (t[1],t[3]),
                                           results)))
         return no_contexts
-        #return tuple(map(readable, no_contexts))
-    #lce_with_sub = lce.replace(op, sub) 
-    #result_has_balanced_parens = has_balanced_parens(lce_with_sub)
-    #result_is_wellformed = result_has_balanced_parens
-    #return sub_is_match and result_is_wellformed
 
 
 #####################################################
