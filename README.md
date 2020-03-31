@@ -45,7 +45,7 @@ where
 
 Note that this is a declarative specification of what linear code expressions are that represent a single glycan or a set of glycans (via the uncertainty operators about bond type and position). See e.g. [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) for more on why specifications like this are common.
 
-**NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. It is *not* the job of a parser to check or enforce things like:
+**NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. It is somewhere between *not* the job of a parser (or not something you really want a parser to do) to check or enforce things like:
  - syntactic *conventions* about the linear ordering of children
  - whether a linear code representation describes something physically possible (= the *denonational semantics* of linear code).
 
@@ -109,7 +109,6 @@ To set up a new conda environment that contains this repository's dependencies,
 
 ## TODO
 
-0. Update conda env to reflect `nltk` dependency.
 1. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.
 2. Add additional tests for code unique to `gregex.py` relative to the dev notebook (e.g. make sure parser recognizes every uncertainty-operator-free linear code expression you can find).
 3. Create a clean demo notebook from the existing development notebook.
