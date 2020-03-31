@@ -4,6 +4,6 @@ conda activate gregex
 
 pip install glypy
 
-conda install jupyter scipy matplotlib numpy tqdm conda-build pytest
+conda install jupyter scipy matplotlib numpy tqdm conda-build pytest nltk
 
 conda install -c conda-forge jupyter_contrib_nbextensions funcy
