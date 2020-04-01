@@ -10,9 +10,10 @@ Note that a prefix or suffix need not be *proper*, and hence can include the ent
 A ligand operator match must have balanced parentheses.
 
 Therefore, for a substring of a glycan in linear code to match a ligand operator, the entire matching substring must be either
-  - the empty string
-  - any infix of a `stem`
-  - a `non_main_branch`, 
+  - have *no* parentheses
+    - = be the empty string, or
+    - = any infix of a `stem`
+  - or have *some parentheses*, and therefore contain a `non_main_branch`, 
     - ...possibly with a suffix of a `subexp` to its left 
       - = a suffix of a `substem` (= part of a chain), or 
       - = a complete `substem` (= complete chain) preceded by one or more complete(!) `non_main_branch`es themselves preceded by a (possibly empty) suffix of a `subexp`
