@@ -106,7 +106,7 @@ The four most salient dependencies are
       - `gregex` should otherwise be Python 3 compatible.
     - Note that nearly every direction for further development of this package depends on third-party packages that have at best limited support for Python 2.
 
-To set up a new conda environment that contains this repository's dependencies,
+To set up a new `conda` environment that contains this repository's dependencies,
 1. `git clone` this repository to a filepath of your choice.
 2. `cd path_to_repo`
 3. Create the conda environment automatically via the `.yml` file in the repository (`conda env create -f gregex_env.yml`, followed by `conda activate gregex`) *or* enter the commands in `conda_manual_environment_creation.txt` at your command prompt, one at a time.
