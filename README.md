@@ -121,7 +121,7 @@ Ab4GNb2(Ab4GNb4|)        |Ma3
 
 $ alias matches2md='csvtk tab2csv -H -t | csvtk add-header -n Left,Match,Right | csvtk csv2md'
 $ python -m gregex 'Ab4GNb2(Ab4GNb4)Ma3' -o '|' -c | matches2md
- Left           |Match    |Right
+Left           |Match    |Right
 :--------------|:--------|:----
 Ab4GNb2        |(Ab4GNb4)|Ma3
 Ab4GNb2(Ab4GNb4|)        |Ma3
