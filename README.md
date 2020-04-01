@@ -1,5 +1,6 @@
 # `gregex`
-A tool for investigating and working with regular-expression-like operators that describe glycans in linear code. Currently an alpha release.
+A software library and command-line tool for investigating and working with linear code representations of glycans and regular-expression-like operators.
+Currently an alpha release.
 
 ## Motivation / context
 
@@ -9,13 +10,13 @@ This package contains functions (and a command-line interface to the main script
 
 ## Usage
 
- - The code in this repository can be imported as a package for programmatic use: `import gregex`.
- - The command-line interface can be accessed via the usual `python -m gregex ...` route. **`python -m gregex -h` will bring up the `argparse` help.**
+  - The code in this repository can be imported as a package for programmatic use: `import gregex`.
+  - The command-line interface can be accessed via the usual `python -m gregex ...` route. **`python -m gregex -h` will bring up the `argparse` help.**
     - Only a fraction of the package's functionality is currently exposed through the command-line interface.
 
 ### CLI example usage
 
-Provided the `gregex` module is on your path (via e.g. step 2 of the installation process below), some of the functionality of the `gregex` Python module is available via `gregex -m gregex <ARGS>`. 
+Provided the `gregex` module is in the current directory or on your path (via e.g. step 2 of the installation process below), some of the functionality of the `gregex` Python module is available via `python -m gregex <ARGS>`. 
 
 All CLI functionality performs some operation on a single glycan linear code expression (the first and main argument to the script). Exactly which operation is dictated by other flags and arguments.
 
@@ -37,13 +38,14 @@ bond_location ⟶ '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '?'
 SU_bare ⟶ 'A' | 'AN' | 'B' | 'E' | 'F' | 'G' | 'GN' | 'G[Q]' | 'H' | 'H[2Q, 4Q]' | 'I' | 'K' | 'L' | 'M' | 'NG' | 'NJ' | 'NN' | 'NN[9N]' | 'N[5Q]' | 'O' | 'P' | 'PH' | 'R' | 'S' | 'U' | 'W' | 'X'
 ```
 
-
 where
- - `⟶`, `|`, `λ` , `*`, and `+` are all reserved and/or metalinguistic symbols with their usual formal-language theoretic meaning (see any textbook or introductory material for reference).
- - all terminal symbols are quoted string literals, except for the empty string.
- - the enumeration of saccharide units is taken from a relatively arbitrary mix of what `glypy` supports and what `glymmer` supports.
+  - `⟶`, `|`, `λ` , `*`, and `+` are all reserved and/or metalinguistic symbols with their usual formal-language theoretic meaning (see any textbook or introductory material for reference).
+  - all terminal symbols are quoted string literals, except for the empty string.
+  - the enumeration of saccharide units is taken from a relatively arbitrary mix of what `glypy` supports and what `glymmer` supports.
 
 Note that this is a declarative specification of what linear code expressions are that represent a single glycan or a set of glycans (via the uncertainty operators about bond type and position). See e.g. [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) for more on why specifications like this are common.
+
+**NOTE 0:** This is a tentative grammar - not the only possible one, and not a complete one. As noted in the *TODO*, extending this grammar is a worthwhile goal.
 
 **NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. Checking or enforcing things like 
   - syntactic *conventions* about the linear ordering of children
@@ -96,12 +98,12 @@ for some match.
 All code has been developed and tested on Ubuntu 18.04.3 and MacOS 10.13.5.
 
 The four most salient dependencies are
- - [`funcy`](https://funcy.readthedocs.io/en/stable/), supporting functional programming.
- - [`nltk`](https://www.nltk.org/), for linear code expression parsing outside of `glypy`.
- - [`glypy`](https://pythonhosted.org/glypy/) (so far only necessary for development, not for CLI functionality or most other functions)
- - `Python 2.7`
+  - [`funcy`](https://funcy.readthedocs.io/en/stable/), supporting functional programming.
+  - [`nltk`](https://www.nltk.org/), for linear code expression parsing outside of `glypy`.
+  - [`glypy`](https://pythonhosted.org/glypy/) (so far only necessary for development, not for CLI functionality or most other functions)
+  - `Python 2.7`
     - `glypy` does not currently support Python 3.
-        - `gregex` should otherwise be Python 3 compatible.
+      - `gregex` should otherwise be Python 3 compatible.
     - Note that nearly every direction for further development of this package depends on third-party packages that have at best limited support for Python 2.
 
 To set up a new conda environment that contains this repository's dependencies,
@@ -173,11 +175,12 @@ Ab4GNb2(Ab4GNb4)|Ma3                |
 
 ## TODO
 
-1. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.
-2. Add additional tests for code unique to `gregex.py` relative to the dev notebook (e.g. make sure parser recognizes every uncertainty-operator-free linear code expression you can find).
-3. Create a clean demo notebook from the existing development notebook.
-4. Setup `readthedocs` documentation.
-5. Qualify imports in `gregex.py` to avoid polluting user namespace when `gregex` is imported as a module. 
+0. Migrate tests from the `dev` Jupyter notebook into `pytest` tests.
+1. Add additional tests for code unique to `gregex.py` relative to the dev notebook (e.g. make sure parser recognizes every uncertainty-operator-free linear code expression you can find).
+2. Create a clean demo notebook from the existing development notebook.
+3. Setup `sphinx`/`readthedocs` documentation.
+4. Qualify imports in `gregex.py` to avoid polluting user namespace when `gregex` is imported as a module. 
+5. Extend the current default Krambeck et al. (2009) grammar for fuller coverage of the syntax defined there.
 6. Allow for distinct grammars to be loaded or swapped programmatically or specified via file (and supported through the CLI).
 7. Add feature for stricter checking/enforcement of child ordering conventions.
 8. Add support to the parser for uncertainty operators via a tool like `minikanren` or `z3`. Note that both directions will likely have limited support for Python 2.

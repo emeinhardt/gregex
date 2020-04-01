@@ -5,6 +5,7 @@ Note that a prefix or suffix need not be *proper*, and hence can include the ent
 
 **precedes, follows** are always synonymous with *to the left of* or *to the right of*, respectively.
 
+
 # Ligand operator
 
 A ligand operator match must have balanced parentheses.
@@ -19,6 +20,7 @@ Therefore, for a substring of a glycan in linear code to match a ligand operator
       - = a complete `substem` (= complete chain) preceded by one or more complete(!) `non_main_branch`es themselves preceded by a (possibly empty) suffix of a `subexp`
     - ...possibly with zero or more complete(!) `non_main_branch`es followed by a (possibly empty) prefix of a `stem` to its right
 
+
 # Continuation operator
 
 A continuation operator match must have a matching right parenthesis for every left parenthesis, but not every right parenthesis needs to be matched. 
@@ -30,3 +32,4 @@ Therefore, for a substring of a glycan in linear code to match a continuation op
     - contain a complete `subexp`.
   - = the substring must contain a suffix of a `subexp` followed by `)`
     - ...possibly with zero or more complete(!) `non_main_branch`es followed by a (possibly empty) prefix of a `stem` to its right 
+

@@ -93,6 +93,7 @@ SUs_with_bonds = set(map(partial(str_join, ''),
 # Bottom up parsing utility functions #
 #######################################
 
+
 def has_balanced_parens(s):
     '''
     Indicates whether the string in question has balanced parentheses.
@@ -146,6 +147,7 @@ def generate_subsequences(s, as_generator=False, with_contexts=False):
 
 to_str = partial(str_join, '')
 rev_to_str = compose(to_str, reversed, to_str)
+
 
 def generate_prefixes(s, as_generator=False):
     l = len(s)
@@ -1058,10 +1060,3 @@ def glypy_plottable(linear_code_expression):
         return False
 
 
-##############################################
-# Defining package-level executable behavior #
-##############################################
-
-
-#if __name__ == __main__:
-#    print("foo")
