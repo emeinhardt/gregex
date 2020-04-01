@@ -29,7 +29,7 @@ For complete details and a description of *all* functionality and flags, use the
 exp ⟶ subexp non_main_branch+ stem | stem | λ
 stem ⟶ SU_with_bond_info* SU_bare
 non_main_branch ⟶ '(' subexp ')'
-subexp ⟶ substem | subexp non_main_branch+ substem
+subexp ⟶ subexp non_main_branch+ substem | substem
 substem ⟶ SU_with_bond_info+
 SU_with_bond_info ⟶ SU_bare bond_type bond_location
 bond_type ⟶ 'a' | 'b' | '?'
@@ -45,9 +45,11 @@ where
 
 Note that this is a declarative specification of what linear code expressions are that represent a single glycan or a set of glycans (via the uncertainty operators about bond type and position). See e.g. [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) for more on why specifications like this are common.
 
-**NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. It is somewhere between *not* the job of a parser (or not something you really want a parser to do) to check or enforce things like:
- - syntactic *conventions* about the linear ordering of children
- - whether a linear code representation describes something physically possible (= the *denonational semantics* of linear code).
+**NOTE 1:** The parser does *exactly* what it says on the tin: it checks syntactic well-formedness. Checking or enforcing things like 
+  - syntactic *conventions* about the linear ordering of children
+  - whether a linear code representation describes something physically possible (= the *denonational semantics* of linear code).
+
+is somewhere between *not* the job of a parser and not something you really want a parser *per se* to do.
 
 Some other part of `gregex` might support these features on top of parsing eventually, but for now they are absent. (`glypy` might support some aspects of the second feature.) 
 
